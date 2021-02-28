@@ -1,5 +1,5 @@
-import React from 'react';
-import Head from 'next/head';
+import React from 'react'
+import Head from 'next/head'
 
 const Index = () => (
   <div>
@@ -11,6 +11,6 @@ const Index = () => (
       <p>Content on Index page</p>
     </div>
   </div>
-);
+)
 
-export default Index;
+export default Index

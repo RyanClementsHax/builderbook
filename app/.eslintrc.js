@@ -16,7 +16,7 @@ module.exports = {
         trailingComma: 'all',
         arrowParens: 'always',
         printWidth: 100,
-        semi: true,
+        semi: false,
       },
     ],
     '@typescript-eslint/camelcase': 'off',
@@ -27,5 +27,5 @@ module.exports = {
     'prefer-arrow-callback': 'error',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
   },
-  plugins: ['prettier', 'react'],
+  plugins: ['prettier', 'react']
 };
