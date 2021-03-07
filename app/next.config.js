@@ -8,4 +8,4 @@ module.exports = {
     PORT_APP: process.env.PORT_APP,
     // more env variables
   },
-};
+}
