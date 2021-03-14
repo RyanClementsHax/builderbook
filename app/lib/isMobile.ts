@@ -6,12 +6,14 @@ export function isMobile(opts) {
   }
 
   let ua = opts.ua
+
   if (!ua && typeof navigator !== 'undefined') {
     ua = navigator.userAgent
   }
+
   if (!ua && opts.req && opts.req.headers && typeof opts.req.headers['user-agent'] === 'string') {
     ua = opts.req.headers['user-agent']
-    console.log(ua)
+    // console.log(ua);
   }
 
   if (typeof ua !== 'string') {

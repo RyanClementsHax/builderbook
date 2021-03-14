@@ -1,4 +1,0 @@
-.env
-node_modules
-app/.next
-app/production-server

@@ -8,8 +8,21 @@ import NProgress from 'nprogress'
 
 import confirm from '../lib/confirm'
 import notify from '../lib/notify'
+import { getUserApiMethod } from '../lib/api/public'
 
-class Index extends React.Component {
+type Props = { user: { email: string } }
+
+class Index extends React.Component<Props> {
+  public static async getInitialProps(ctx) {
+    const { req } = ctx
+
+    const user = await getUserApiMethod(req)
+
+    console.log(user)
+
+    return { ...user }
+  }
+
   public render() {
     return (
       <Layout {...this.props}>
@@ -30,7 +43,7 @@ class Index extends React.Component {
                 title: 'Are you sure?',
                 message: 'explanatory message',
                 onAnswer: async (answer) => {
-                  console.log(answer)
+                  // console.log(answer);
                   if (!answer) {
                     return
                   }
@@ -51,6 +64,7 @@ class Index extends React.Component {
           >
             Test Confirmer and Notifier
           </Button>
+          <p>Email: {this.props.user.email}</p>
         </div>
       </Layout>
     )
