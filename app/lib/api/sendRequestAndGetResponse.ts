@@ -12,10 +12,14 @@ export default async function sendRequestAndGetResponse(path, opts: any = {}) {
 
   const qs = opts.qs || ''
 
+  console.log(`before: ${process.env.URL_API}${path}${qs}`)
+
   const response = await fetch(
     `${process.env.URL_API}${path}${qs}`,
     Object.assign({ method: 'POST', credentials: 'include' }, opts, { headers }),
   )
+
+  console.log(`after: ${process.env.URL_API}${path}${qs}`)
 
   // console.log(`${process.env.URL_API}${path}${qs}`);
   // console.log(response.status);
