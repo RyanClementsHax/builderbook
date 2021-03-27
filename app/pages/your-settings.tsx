@@ -8,6 +8,12 @@ import * as React from 'react'
 import Layout from '../components/layout'
 
 import { getUserBySlugApiMethod, updateProfileApiMethod } from '../lib/api/public'
+import {
+  getSignedRequestForUploadApiMethod,
+  uploadFileUsingSignedPutRequestApiMethod,
+} from '../lib/api/team-member'
+
+import { resizeImage } from '../lib/resizeImage'
 
 import notify from '../lib/notify'
 
@@ -20,7 +26,7 @@ type State = { newName: string; newAvatarUrl: string; disabled: boolean }
 
 class YourSettings extends React.Component<Props, State> {
   public static async getInitialProps() {
-    const slug = 'asdf'
+    const slug = 'team-builder-book'
 
     const user = await getUserBySlugApiMethod(slug)
 
@@ -111,6 +117,7 @@ class YourSettings extends React.Component<Props, State> {
             id="upload-file"
             type="file"
             style={{ display: 'none' }}
+            onChange={this.uploadFile}
           />
           <p />
           <br />
@@ -144,6 +151,63 @@ class YourSettings extends React.Component<Props, State> {
     } catch (error) {
       notify(error)
     } finally {
+      this.setState({ disabled: false })
+      NProgress.done()
+    }
+  }
+
+  private uploadFile = async () => {
+    const fileElement = document.getElementById('upload-file') as HTMLFormElement
+    const file = fileElement.files[0]
+
+    if (file == null) {
+      notify('No file selected for upload.')
+      return
+    }
+
+    const fileName = file.name
+    const fileType = file.type
+
+    NProgress.start()
+    this.setState({ disabled: true })
+
+    const bucket = process.env.BUCKET_FOR_AVATARS
+
+    const prefix = 'team-builder-book'
+
+    try {
+      const responseFromApiServerForUpload = await getSignedRequestForUploadApiMethod({
+        fileName,
+        fileType,
+        prefix,
+        bucket,
+      })
+
+      const resizedFile = await resizeImage(file, 128, 128)
+
+      console.log(file)
+      console.log(resizedFile)
+
+      await uploadFileUsingSignedPutRequestApiMethod(
+        resizedFile,
+        responseFromApiServerForUpload.signedRequest,
+        { 'Cache-Control': 'max-age=2592000' },
+      )
+
+      this.setState({
+        newAvatarUrl: responseFromApiServerForUpload.url,
+      })
+
+      await updateProfileApiMethod({
+        name: this.state.newName,
+        avatarUrl: this.state.newAvatarUrl,
+      })
+
+      notify('You successfully uploaded new avatar.')
+    } catch (error) {
+      notify(error)
+    } finally {
+      fileElement.value = ''
       this.setState({ disabled: false })
       NProgress.done()
     }
