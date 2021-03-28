@@ -8,12 +8,10 @@ export const getUserApiMethod = (request) =>
     method: 'GET',
   })
 
-export const getUserBySlugApiMethod = (slug) => {
-  console.log(slug)
-  return sendRequestAndGetResponse(`${BASE_PATH}/get-user-by-slug`, {
+export const getUserBySlugApiMethod = (slug) =>
+  sendRequestAndGetResponse(`${BASE_PATH}/get-user-by-slug`, {
     body: JSON.stringify({ slug }),
   })
-}
 
 export const updateProfileApiMethod = (data) =>
   sendRequestAndGetResponse(`${BASE_PATH}/user/update-profile`, {
