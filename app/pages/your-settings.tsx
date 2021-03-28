@@ -7,7 +7,7 @@ import * as React from 'react'
 
 import Layout from '../components/layout'
 
-import { getUserBySlugApiMethod, updateProfileApiMethod } from '../lib/api/public'
+import { updateProfileApiMethod } from '../lib/api/public'
 import {
   getSignedRequestForUploadApiMethod,
   uploadFileUsingSignedPutRequestApiMethod,
@@ -17,6 +17,8 @@ import { resizeImage } from '../lib/resizeImage'
 
 import notify from '../lib/notify'
 
+import withAuth from '../lib/withAuth'
+
 type Props = {
   isMobile: boolean
   user: { email: string; displayName: string; slug: string; avatarUrl: string }
@@ -25,15 +27,23 @@ type Props = {
 type State = { newName: string; newAvatarUrl: string; disabled: boolean }
 
 class YourSettings extends React.Component<Props, State> {
-  public static async getInitialProps() {
-    const slug = 'team-builder-book'
+  // public static async getInitialProps(ctx) {
+  //   const user = await getUserApiMethod(ctx.req);
 
-    const user = await getUserBySlugApiMethod(slug)
+  //   console.log(user);
 
-    console.log(user)
+  //   return { ...user };
+  // }
 
-    return { ...user }
-  }
+  // public static async getInitialProps() {
+  //   const slug = 'team-builder-book';
+
+  //   const user = await getUserBySlugApiMethod(slug);
+
+  //   console.log(user);
+
+  //   return { ...user };
+  // }
 
   constructor(props) {
     super(props)
@@ -214,4 +224,4 @@ class YourSettings extends React.Component<Props, State> {
   }
 }
 
-export default YourSettings
+export default withAuth(YourSettings)
