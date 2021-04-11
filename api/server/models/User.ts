@@ -1,7 +1,10 @@
 import * as _ from 'lodash';
 import * as mongoose from 'mongoose';
 
+import sendEmail from '../aws-ses';
+import { addToMailchimp } from '../mailchimp';
 import { generateSlug } from '../utils/slugify';
+import getEmailTemplate from './EmailTemplate';
 
 mongoose.set('useFindAndModify', false);
 
@@ -77,6 +80,14 @@ interface UserModel extends mongoose.Model<UserDocument> {
     avatarUrl: string;
     googleToken: { accessToken?: string; refreshToken?: string };
   }): Promise<UserDocument>;
+
+  signInOrSignUpByPasswordless({
+    uid,
+    email,
+  }: {
+    uid: string;
+    email: string;
+  }): Promise<UserDocument>;
 }
 
 class UserClass extends mongoose.Model {
@@ -151,6 +162,71 @@ class UserClass extends mongoose.Model {
       slug,
       isSignedupViaGoogle: true,
     });
+
+    const emailTemplate = await getEmailTemplate('welcome', { userName: displayName });
+
+    if (!emailTemplate) {
+      throw new Error('Welcome email template not found');
+    }
+
+    try {
+      await sendEmail({
+        from: `Kelly from saas-app.async-await.com <${process.env.EMAIL_SUPPORT_FROM_ADDRESS}>`,
+        to: [email],
+        subject: emailTemplate.subject,
+        body: emailTemplate.message,
+      });
+    } catch (err) {
+      console.error('Email sending error:', err);
+    }
+
+    try {
+      await addToMailchimp({ email, listName: 'signups' });
+    } catch (error) {
+      console.error('Mailchimp error:', error);
+    }
+
+    return _.pick(newUser, this.publicFields());
+  }
+
+  public static async signInOrSignUpByPasswordless({ uid, email }) {
+    const user = await this.findOne({ email }).select(this.publicFields().join(' ')).lean();
+
+    if (user) {
+      throw Error('User already exists');
+    }
+
+    const slug = await generateSlug(this, email);
+
+    const newUser = await this.create({
+      _id: uid,
+      createdAt: new Date(),
+      email,
+      slug,
+    });
+
+    const emailTemplate = await getEmailTemplate('welcome', { userName: email });
+
+    if (!emailTemplate) {
+      throw new Error('Email template "welcome" not found in database.');
+    }
+
+    try {
+      await sendEmail({
+        from: `Kelly from saas-app.async-await.com <${process.env.EMAIL_SUPPORT_FROM_ADDRESS}>`,
+        to: [email],
+        subject: emailTemplate.subject,
+        body: emailTemplate.message,
+      });
+    } catch (err) {
+      console.error('Email sending error:', err);
+    }
+
+    try {
+      await addToMailchimp({ email, listName: 'signups' });
+    } catch (error) {
+      console.error('Mailchimp error:', error);
+    }
 
     return _.pick(newUser, this.publicFields());
   }

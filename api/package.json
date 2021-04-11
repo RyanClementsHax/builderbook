@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "aws-sdk": "^2.796.0",
+    "bcrypt": "^5.0.0",
     "connect-mongo": "^3.2.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
@@ -23,8 +24,11 @@
     "express-session": "^1.17.1",
     "lodash": "^4.17.20",
     "mongoose": "^5.10.15",
+    "node-fetch": "^2.6.1",
     "passport": "^0.4.1",
     "passport-google-oauth": "^2.0.0",
+    "passwordless": "^1.1.3",
+    "passwordless-tokenstore": "^0.0.10",
     "typescript": "^4.1.3"
   },
   "devDependencies": {
@@ -36,6 +40,7 @@
     "@types/lodash": "^4.14.108",
     "@types/mongoose": "^5.5.43",
     "@types/node": "^12.12.2",
+    "@types/node-fetch": "^1.6.9",
     "@types/passport": "^0.4.5",
     "@typescript-eslint/eslint-plugin": "^4.2.0",
     "@typescript-eslint/parser": "^4.2.0",
