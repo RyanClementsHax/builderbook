@@ -4,15 +4,12 @@ import * as express from 'express';
 import * as session from 'express-session';
 import * as mongoose from 'mongoose';
 
-// eslint-disable-next-line
-require('dotenv').config();
-
 import api from './api';
 import { setupGoogle } from './google-auth';
 import { setupPasswordless } from './passwordless-auth';
 
-// import { insertTemplates } from './models/EmailTemplate';
-
+// eslint-disable-next-line
+require('dotenv').config();
 
 const options = {
   useNewUrlParser: true,
@@ -22,8 +19,6 @@ const options = {
 };
 
 mongoose.connect(process.env.MONGO_URL_TEST, options);
-
-// insertTemplates();
 
 const server = express();
 

@@ -1,62 +1,40 @@
 import Avatar from '@material-ui/core/Avatar'
 import Button from '@material-ui/core/Button'
 import TextField from '@material-ui/core/TextField'
+import { inject, observer } from 'mobx-react'
 import Head from 'next/head'
 import NProgress from 'nprogress'
 import * as React from 'react'
 
 import Layout from '../components/layout'
 
-import { updateProfileApiMethod } from '../lib/api/public'
 import {
   getSignedRequestForUploadApiMethod,
   uploadFileUsingSignedPutRequestApiMethod,
 } from '../lib/api/team-member'
 
-import { resizeImage } from '../lib/resizeImage'
-
 import notify from '../lib/notify'
-
+import { resizeImage } from '../lib/resizeImage'
+import { Store } from '../lib/store'
 import withAuth from '../lib/withAuth'
 
-type Props = {
-  isMobile: boolean
-  user: { email: string; displayName: string; slug: string; avatarUrl: string }
-}
+type Props = { isMobile: boolean; store: Store; redirectMessage?: string }
 
 type State = { newName: string; newAvatarUrl: string; disabled: boolean }
 
 class YourSettings extends React.Component<Props, State> {
-  // public static async getInitialProps(ctx) {
-  //   const user = await getUserApiMethod(ctx.req);
-
-  //   console.log(user);
-
-  //   return { ...user };
-  // }
-
-  // public static async getInitialProps() {
-  //   const slug = 'team-builder-book';
-
-  //   const user = await getUserBySlugApiMethod(slug);
-
-  //   console.log(user);
-
-  //   return { ...user };
-  // }
-
   constructor(props) {
     super(props)
 
     this.state = {
-      newName: this.props.user.displayName,
-      newAvatarUrl: this.props.user.avatarUrl,
+      newName: this.props.store.currentUser.displayName,
+      newAvatarUrl: this.props.store.currentUser.avatarUrl,
       disabled: false,
     }
   }
 
   public render() {
-    const { user } = this.props
+    const { currentUser } = this.props.store
     const { newName, newAvatarUrl } = this.state
 
     return (
@@ -74,14 +52,21 @@ class YourSettings extends React.Component<Props, State> {
         >
           <h3>Your Settings</h3>
           <h4 style={{ marginTop: '40px' }}>Your account</h4>
-          <ul>
+          <div>
+            <i className="material-icons" color="action" style={{ verticalAlign: 'text-bottom' }}>
+              done
+            </i>{' '}
+            {currentUser.isSignedupViaGoogle
+              ? 'You signed up on Async using your Google account.'
+              : 'You signed up on Async using your email.'}
+            <p />
             <li>
-              Your email: <b>{user.email}</b>
+              Your email: <b>{currentUser.email}</b>
             </li>
             <li>
-              Your name: <b>{user.displayName}</b>
+              Your name: <b>{currentUser.displayName}</b>
             </li>
-          </ul>
+          </div>
           <form onSubmit={this.onSubmit} autoComplete="off">
             <h4>Your name</h4>
             <TextField
@@ -136,8 +121,20 @@ class YourSettings extends React.Component<Props, State> {
     )
   }
 
+  public componentDidMount() {
+    const { redirectMessage } = this.props
+
+    console.log(redirectMessage)
+
+    if (redirectMessage) {
+      notify(redirectMessage)
+    }
+  }
+
   private onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+
+    const { currentUser } = this.props.store
 
     const { newName, newAvatarUrl } = this.state
 
@@ -152,10 +149,7 @@ class YourSettings extends React.Component<Props, State> {
     this.setState({ disabled: true })
 
     try {
-      await updateProfileApiMethod({
-        name: newName,
-        avatarUrl: newAvatarUrl,
-      })
+      await currentUser.updateProfile({ name: newName, avatarUrl: newAvatarUrl })
 
       notify('You successfully updated your profile.')
     } catch (error) {
@@ -170,6 +164,8 @@ class YourSettings extends React.Component<Props, State> {
     const fileElement = document.getElementById('upload-file') as HTMLFormElement
     const file = fileElement.files[0]
 
+    const { currentUser } = this.props.store
+
     if (file == null) {
       notify('No file selected for upload.')
       return
@@ -183,7 +179,7 @@ class YourSettings extends React.Component<Props, State> {
 
     const bucket = process.env.BUCKET_FOR_AVATARS
 
-    const prefix = 'team-builder-book'
+    const prefix = `${currentUser.slug}`
 
     try {
       const responseFromApiServerForUpload = await getSignedRequestForUploadApiMethod({
@@ -208,7 +204,7 @@ class YourSettings extends React.Component<Props, State> {
         newAvatarUrl: responseFromApiServerForUpload.url,
       })
 
-      await updateProfileApiMethod({
+      await currentUser.updateProfile({
         name: this.state.newName,
         avatarUrl: this.state.newAvatarUrl,
       })
@@ -224,4 +220,4 @@ class YourSettings extends React.Component<Props, State> {
   }
 }
 
-export default withAuth(YourSettings)
+export default withAuth(inject('store')(observer(YourSettings)))

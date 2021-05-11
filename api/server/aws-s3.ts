@@ -17,7 +17,7 @@ async function signRequestForUpload({ fileName, fileType, prefix, bucket }) {
     ACL: acl,
   };
 
-  console.log(prefix);
+  console.log(key, bucket);
 
   const s3 = new aws.S3({
     apiVersion: 'latest',
@@ -34,6 +34,8 @@ async function signRequestForUpload({ fileName, fileType, prefix, bucket }) {
         signedRequest: data,
         url: `${parsedUrl.protocol}//${parsedUrl.hostname}${parsedUrl.pathname}`,
       };
+
+      console.log(returnData);
 
       if (err) {
         console.error(err);

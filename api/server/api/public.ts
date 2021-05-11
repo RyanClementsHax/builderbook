@@ -1,6 +1,7 @@
 import * as express from 'express';
 
 import User from '../models/User';
+import Invitation from '../models/Invitation';
 
 const router = express.Router();
 
@@ -25,17 +26,30 @@ router.post('/get-user-by-slug', async (req, res, next) => {
   }
 });
 
-router.post('/user/update-profile', async (req, res, next) => {
-  try {
-    const { name, avatarUrl } = req.body;
+router.get('/invitations/accept-and-get-team-by-token', async (req, res, next) => {
+  const token = req.query.token as string;
 
-    const updatedUser = await User.updateProfile({
+  try {
+    const team = await Invitation.getTeamByToken({ token });
+
+    if (req.user) {
+      await Invitation.addUserToTeam({ token, user: req.user });
+    }
+
+    res.json({ team });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/invitations/remove-invitation-if-member-added', async (req, res, next) => {
+  try {
+    const team = await Invitation.removeIfMemberAdded({
+      token: req.body.token,
       userId: req.user.id,
-      name,
-      avatarUrl,
     });
 
-    res.json({ updatedUser });
+    res.json({ team });
   } catch (err) {
     next(err);
   }

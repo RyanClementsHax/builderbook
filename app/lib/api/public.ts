@@ -13,12 +13,26 @@ export const getUserBySlugApiMethod = (slug) =>
     body: JSON.stringify({ slug }),
   })
 
-export const updateProfileApiMethod = (data) =>
-  sendRequestAndGetResponse(`${BASE_PATH}/user/update-profile`, {
-    body: JSON.stringify(data),
+export const emailLoginLinkApiMethod = ({
+  email,
+  invitationToken,
+}: {
+  email: string
+  invitationToken?: string
+}) =>
+  sendRequestAndGetResponse('/auth/email-login-link', {
+    qs: { invitationToken },
+    body: JSON.stringify({ user: email }),
   })
 
-export const emailLoginLinkApiMethod = ({ email }: { email: string }) =>
-  sendRequestAndGetResponse('/auth/email-login-link', {
-    body: JSON.stringify({ user: email }),
+export const acceptAndGetInvitedTeamByTokenApiMethod = (token: string, request) =>
+  sendRequestAndGetResponse(`${BASE_PATH}/invitations/accept-and-get-team-by-token`, {
+    request,
+    method: 'GET',
+    qs: { token },
+  })
+
+export const removeInvitationIfMemberAddedApiMethod = (token: string) =>
+  sendRequestAndGetResponse(`${BASE_PATH}/invitations/remove-invitation-if-member-added`, {
+    body: JSON.stringify({ token }),
   })

@@ -25,7 +25,9 @@ async function addToMailchimp({ email, listName }) {
     email_address: email,
     status: 'subscribed',
   };
+
   const path = `/lists/${LIST_IDS[listName]}/members/`;
+
   await callAPI({ path, method: 'POST', data });
 }
 
