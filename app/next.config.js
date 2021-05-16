@@ -8,5 +8,6 @@ module.exports = {
     URL_API: process.env.URL_API,
     BUCKET_FOR_AVATARS: process.env.BUCKET_FOR_AVATARS,
     BUCKET_FOR_TEAM_LOGOS: process.env.BUCKET_FOR_TEAM_LOGOS,
+    BUCKET_FOR_POSTS: process.env.BUCKET_FOR_POSTS,
   },
 }

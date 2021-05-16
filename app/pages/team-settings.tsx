@@ -346,6 +346,17 @@ class TeamSettings extends React.Component<Props, State> {
       return
     }
 
+    // const ifTeamLeaderMustBeCustomer = await currentTeam.checkIfTeamLeaderMustBeCustomer();
+    // if (ifTeamLeaderMustBeCustomer) {
+    //   notify(
+    //     'To add a third team member, you have to become a paid customer.' +
+    //       '<p />' +
+    //       ' To become a paid customer,' +
+    //       ' navigate to Billing page.',
+    //   );
+    //   return;
+    // }
+
     this.setState({ inviteMemberOpen: true })
   }
 

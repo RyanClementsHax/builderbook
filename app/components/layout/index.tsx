@@ -10,6 +10,7 @@ import Confirmer from '../common/Confirmer'
 import Notifier from '../common/Notifier'
 
 import { Store } from '../../lib/store'
+import DiscussionList from '../discussions/DiscussionList'
 
 const styleGrid = {
   width: '100vw',
@@ -136,6 +137,7 @@ function LayoutWrapper({
             <hr />
             <p />
             <p />
+            <DiscussionList store={store} team={store.currentTeam} isMobile={isMobile} />
           </Grid>
         ) : null}
 
