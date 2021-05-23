@@ -9,6 +9,7 @@ import api from './api';
 import { setupGoogle } from './google-auth';
 import { setupPasswordless } from './passwordless-auth';
 import { setupSockets } from './sockets';
+import { stripeWebhookAndCheckoutCallback } from './stripe';
 
 // eslint-disable-next-line
 require('dotenv').config();
@@ -31,6 +32,8 @@ server.use(
     credentials: true,
   }),
 );
+
+stripeWebhookAndCheckoutCallback({ server });
 
 server.use(express.json());
 

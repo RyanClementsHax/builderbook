@@ -37,14 +37,16 @@ app.prepare().then(() => {
     app.render(req, res, '/discussion', { teamSlug })
   })
 
+  server.get('/team/:teamSlug/billing', (req, res) => {
+    const { teamSlug } = req.params
+    app.render(req, res, '/billing', { teamSlug, ...(req.query || {}) })
+  })
+
   server.all('*', (req, res) => {
     handle(req, res)
   })
 
-  server.listen(process.env.PORT_APP, (err: Error) => {
-    if (err) {
-      throw err
-    }
+  server.listen(process.env.PORT_APP, () => {
     console.log(`> Ready on ${process.env.URL_APP}`)
   })
 })

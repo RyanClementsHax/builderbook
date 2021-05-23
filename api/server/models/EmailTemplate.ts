@@ -62,15 +62,15 @@ export async function insertTemplates() {
         <br/>Click here to accept the invitation: <%= invitationURL%>
       `,
     },
-    // {
-    //   name: 'newPost',
-    //   subject: 'New Post was created in Discussion: <%= discussionName %>',
-    //   message: `<p>New Post in Discussion: "<%= discussionName%>" by <%= authorName%></p>
-    //     New Post: "<%= postContent %>"
-    //     <p>---</p>
-    //     <p>View it at <a href="<%= discussionLink %>"><%= discussionLink %></a>.</p>
-    //   `,
-    // },
+    {
+      name: 'newPost',
+      subject: 'New Post was created in Discussion: <%= discussionName %>',
+      message: `<p>New Post in Discussion: "<%= discussionName%>" by <%= authorName%></p>
+        New Post: "<%= postContent %>"
+        <p>---</p>
+        <p>View it at <a href="<%= discussionLink %>"><%= discussionLink %></a>.</p>
+      `,
+    },
   ];
 
   for (const t of templates) {

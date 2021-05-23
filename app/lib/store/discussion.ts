@@ -5,6 +5,7 @@ import {
   deletePostApiMethod,
   editDiscussionApiMethod,
   getPostListApiMethod,
+  sendDataToLambdaApiMethod,
 } from '../api/team-member'
 import { Store } from './index'
 import { Team } from './team'
@@ -22,6 +23,8 @@ class Discussion {
   public posts: IObservableArray<Post> = observable([])
   public isLoadingPosts = false
 
+  public notificationType: string
+
   constructor(params) {
     this._id = params._id
     this.createdUserId = params.createdUserId
@@ -31,6 +34,8 @@ class Discussion {
     this.name = params.name
     this.slug = params.slug
     this.memberIds.replace(params.memberIds || [])
+
+    this.notificationType = params.notificationType
 
     if (params.initialPosts) {
       this.setInitialPosts(params.initialPosts)
@@ -206,6 +211,28 @@ class Discussion {
   public deletePostFromLocalCache(postId) {
     const post = this.posts.find((t) => t._id === postId)
     this.posts.remove(post)
+  }
+
+  public async sendDataToLambda({
+    discussionName,
+    discussionLink,
+    postContent,
+    authorName,
+    userIds,
+  }) {
+    console.log(discussionName, discussionLink, authorName, postContent, userIds)
+    try {
+      await sendDataToLambdaApiMethod({
+        discussionName,
+        discussionLink,
+        postContent,
+        authorName,
+        userIds,
+      })
+    } catch (error) {
+      console.error(error)
+      throw error
+    }
   }
 }
 

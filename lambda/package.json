@@ -1,18 +1,9 @@
 {
-  "name": "api",
+  "name": "lambda",
   "version": "1",
   "license": "MIT",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only --project tsconfig.server.json server/server.ts",
-    "lint": "eslint . --ext .ts,.tsx",
-    "test": "jest"
-  },
-  "jest": {
-    "preset": "ts-jest",
-    "testPathIgnorePatterns": [
-      "production-server"
-    ],
-    "testEnvironment": "node"
+    "lint": "eslint . --ext .ts,.tsx"
   },
   "dependencies": {
     "aws-sdk": "^2.796.0",
@@ -55,6 +46,8 @@
     "eslint-plugin-prettier": "^3.3.1",
     "jest": "^26.4.2",
     "prettier": "^2.2.1",
+    "serverless-dotenv-plugin": "^3.0.0",
+    "serverless-plugin-typescript": "^1.1.9",
     "ts-jest": "^26.4.4",
     "ts-node-dev": "^1.0.0-pre.44"
   }

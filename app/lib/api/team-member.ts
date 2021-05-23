@@ -90,3 +90,9 @@ export const deletePostApiMethod = (data) =>
   sendRequestAndGetResponse(`${BASE_PATH}/posts/delete`, {
     body: JSON.stringify(data),
   })
+
+export const sendDataToLambdaApiMethod = (data) =>
+  sendRequestAndGetResponse(`${process.env.API_GATEWAY_ENDPOINT}/`, {
+    externalServer: true,
+    body: JSON.stringify(data),
+  })
