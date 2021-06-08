@@ -9,11 +9,13 @@ import Invitation from './models/Invitation';
 function setupPasswordless({ server }) {
   const mongoStore = new PasswordlessMongoStore();
 
+  const dev = process.env.NODE_ENV !== 'production';
+
   passwordless.addDelivery(async (tokenToSend, uidToSend, recipient, callback) => {
     try {
       const template = await getEmailTemplate('login', {
         loginURL: `${
-          process.env.URL_API
+          dev ? process.env.URL_API : process.env.PRODUCTION_URL_API
         }/auth/logged_in?token=${tokenToSend}&uid=${encodeURIComponent(uidToSend)}`,
       });
 
@@ -50,7 +52,7 @@ function setupPasswordless({ server }) {
     '/auth/email-login-link',
     passwordless.requestToken(async (email, __, callback) => {
       try {
-        const user = await User.findOne({ email }).select('_id').lean();
+        const user = await User.findOne({ email }).select('_id').setOptions({ lean: true });
 
         if (user) {
           callback(null, user._id);
@@ -101,16 +103,18 @@ function setupPasswordless({ server }) {
       if (req.user && !req.user.defaultTeamSlug) {
         redirectUrlAfterLogin = '/create-team';
       } else {
-        redirectUrlAfterLogin = `/team/${req.user.defaultTeamSlug}/discussions`;
+        redirectUrlAfterLogin = `/teams/${req.user.defaultTeamSlug}/discussions`;
       }
 
-      res.redirect(`${process.env.URL_APP}${redirectUrlAfterLogin}`);
+      res.redirect(
+        `${dev ? process.env.URL_APP : process.env.PRODUCTION_URL_APP}${redirectUrlAfterLogin}`,
+      );
     },
   );
 
   server.get('/logout', passwordless.logout(), (req, res) => {
     req.logout();
-    res.redirect(`${process.env.URL_APP}/login`);
+    res.redirect(`${dev ? process.env.URL_APP : process.env.PRODUCTION_URL_APP}/login`);
   });
 }
 

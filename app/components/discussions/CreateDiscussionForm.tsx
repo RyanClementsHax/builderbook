@@ -35,12 +35,16 @@ type State = {
 }
 
 class CreateDiscussionForm extends React.Component<Props, State> {
-  public state = {
-    name: '',
-    memberIds: [],
-    disabled: false,
-    content: '',
-    notificationType: 'default',
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      name: '',
+      memberIds: [],
+      disabled: false,
+      content: '',
+      notificationType: 'default',
+    }
   }
 
   public render() {
@@ -121,7 +125,7 @@ class CreateDiscussionForm extends React.Component<Props, State> {
                 </Button>
                 {isMobile ? <p /> : null}
                 <Button
-                  variant="outlined"
+                  variant="contained"
                   onClick={this.handleClose}
                   disabled={this.state.disabled}
                   style={{ marginLeft: isMobile ? '0px' : '20px' }}
@@ -148,7 +152,7 @@ class CreateDiscussionForm extends React.Component<Props, State> {
                 </Button>
                 {isMobile ? <p /> : null}
                 <Button
-                  variant="outlined"
+                  variant="contained"
                   onClick={this.handleClose}
                   disabled={this.state.disabled}
                   style={{ marginLeft: isMobile ? '0px' : '20px' }}
@@ -204,10 +208,10 @@ class CreateDiscussionForm extends React.Component<Props, State> {
       return
     }
 
-    if (!memberIds || memberIds.length < 1) {
-      notify('Please assign at least one person to this Discussion.')
-      return
-    }
+    // if (!memberIds || memberIds.length < 1) {
+    //   notify('Please assign at least one person to this Discussion.');
+    //   return;
+    // }
 
     if (!notificationType) {
       notify('Please select notification type.')
@@ -228,12 +232,16 @@ class CreateDiscussionForm extends React.Component<Props, State> {
 
       const post = await discussion.addPost(content)
 
+      const dev = process.env.NODE_ENV !== 'production'
+
       if (discussion.notificationType === 'email') {
         const userIdsForLambda = discussion.memberIds.filter((m) => m !== discussion.createdUserId)
 
         await discussion.sendDataToLambda({
           discussionName: discussion.name,
-          discussionLink: `${process.env.URL_APP}/team/${discussion.team.slug}/discussions/${discussion.slug}`,
+          discussionLink: `${dev ? process.env.URL_APP : process.env.PRODUCTION_URL_APP}/teams/${
+            discussion.team.slug
+          }/discussions/${discussion.slug}`,
           postContent: post.content,
           authorName: post.user.displayName,
           userIds: userIdsForLambda,
@@ -246,7 +254,7 @@ class CreateDiscussionForm extends React.Component<Props, State> {
 
       Router.push(
         `/discussion?teamSlug=${currentTeam.slug}&discussionSlug=${discussion.slug}`,
-        `/team/${currentTeam.slug}/discussions/${discussion.slug}`,
+        `/teams/${currentTeam.slug}/discussions/${discussion.slug}`,
       )
     } catch (error) {
       console.log(error)

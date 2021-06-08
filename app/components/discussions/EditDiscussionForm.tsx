@@ -36,12 +36,16 @@ type State = {
 }
 
 class EditDiscussionForm extends React.Component<Props, State> {
-  public state = {
-    name: '',
-    memberIds: [],
-    disabled: false,
-    discussionId: '',
-    notificationType: 'default',
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      name: '',
+      memberIds: [],
+      disabled: false,
+      discussionId: '',
+      notificationType: 'default',
+    }
   }
 
   public static getDerivedStateFromProps(props: Props, state: State) {
@@ -117,7 +121,7 @@ class EditDiscussionForm extends React.Component<Props, State> {
             <DialogActions>
               <Button
                 color="primary"
-                variant="outlined"
+                variant="contained"
                 onClick={this.handleClose}
                 disabled={this.state.disabled}
               >
@@ -170,10 +174,10 @@ class EditDiscussionForm extends React.Component<Props, State> {
       memberIds.push(discussion.store.currentUser._id)
     }
 
-    if (!memberIds || memberIds.length < 1) {
-      notify('Please assign at least one person to this Discussion.')
-      return
-    }
+    // if (!memberIds || memberIds.length < 1) {
+    //   notify('Please assign at least one person to this Discussion.');
+    //   return;
+    // }
 
     if (!notificationType) {
       notify('Please select notification type.')

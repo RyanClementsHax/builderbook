@@ -29,9 +29,13 @@ type State = {
 }
 
 class DiscussionPageComp extends React.Component<Props, State> {
-  public state = {
-    selectedPost: null,
-    showMarkdownClicked: false,
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      selectedPost: null,
+      showMarkdownClicked: false,
+    }
   }
 
   public render() {
@@ -53,7 +57,7 @@ class DiscussionPageComp extends React.Component<Props, State> {
     const discussion = this.getDiscussion(discussionSlug)
 
     if (!discussion) {
-      if (currentTeam.isLoadingDiscussions) {
+      if (currentTeam.isLoadingDiscussions || store.isServer) {
         return (
           <Layout {...this.props}>
             <Head>
@@ -149,7 +153,7 @@ class DiscussionPageComp extends React.Component<Props, State> {
     if (!slug && currentTeam.discussions.length > 0) {
       Router.replace(
         `/discussion?teamSlug=${teamSlug}&discussionSlug=${currentTeam.orderedDiscussions[0].slug}`,
-        `/team/${teamSlug}/discussions/${currentTeam.orderedDiscussions[0].slug}`,
+        `/teams/${teamSlug}/discussions/${currentTeam.orderedDiscussions[0].slug}`,
       )
       return
     }

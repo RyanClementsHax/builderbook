@@ -16,6 +16,12 @@ Router.events.on('routeChangeComplete', (url) => {
     store.changeCurrentUrl(url)
   }
 
+  if (window && process.env.GA_MEASUREMENT_ID) {
+    ;(window as any).gtag('config', process.env.GA_MEASUREMENT_ID, {
+      page_path: url,
+    })
+  }
+
   NProgress.done()
 })
 
@@ -58,8 +64,10 @@ export default function withAuth(Component, { loginRequired = true, logoutRequir
           redirectUrl = '/create-team'
           asUrl = '/create-team'
         } else {
-          redirectUrl = `/your-settings`
-          asUrl = `/your-settings`
+          // redirectUrl = `/your-settings`;
+          // asUrl = `/your-settings`;
+          redirectUrl = `/teams/${user.defaultTeamSlug}/discussions`
+          asUrl = `/teams/${user.defaultTeamSlug}/discussions`
         }
       }
 

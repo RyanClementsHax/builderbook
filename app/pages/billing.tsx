@@ -4,6 +4,7 @@ import Head from 'next/head'
 import * as React from 'react'
 import { loadStripe } from '@stripe/stripe-js'
 import Button from '@material-ui/core/Button'
+import DoneIcon from '@material-ui/icons/Done'
 import NProgress from 'nprogress'
 
 import Layout from '../components/layout'
@@ -12,7 +13,7 @@ import { Store } from '../lib/store'
 import withAuth from '../lib/withAuth'
 import { fetchCheckoutSessionApiMethod } from '../lib/api/team-leader'
 
-const dev = process.env && process.env.NODE_ENV && process.env.NODE_ENV !== 'production'
+const dev = process.env.NODE_ENV !== 'production'
 
 const stripePromise = loadStripe(
   dev ? process.env.STRIPE_TEST_PUBLISHABLEKEY : process.env.STRIPE_LIVE_PUBLISHABLEKEY,
@@ -28,7 +29,11 @@ type Props = {
 type State = { disabled: boolean; showInvoices: boolean }
 
 class Billing extends React.Component<Props, State> {
-  public state = { disabled: false, showInvoices: false }
+  constructor(props) {
+    super(props)
+
+    this.state = { disabled: false, showInvoices: false }
+  }
 
   public render() {
     const { store, isMobile } = this.props
@@ -78,7 +83,7 @@ class Billing extends React.Component<Props, State> {
           <br />
           <h4>Payment history</h4>
           <Button
-            variant="outlined"
+            variant="contained"
             color="primary"
             onClick={this.showListOfInvoicesOnClick}
             disabled={this.state.disabled}
@@ -154,10 +159,8 @@ class Billing extends React.Component<Props, State> {
         <React.Fragment>
           <span>
             {' '}
-            <i className="material-icons" color="action" style={{ verticalAlign: 'text-bottom' }}>
-              done
-            </i>{' '}
-            Subscription is active.
+            <DoneIcon color="action" style={{ verticalAlign: 'text-bottom' }} /> Subscription is
+            active.
             <p>
               You subscribed <b>{currentTeam.name}</b> on <b>{subscriptionDate}</b>.
             </p>
@@ -168,7 +171,7 @@ class Billing extends React.Component<Props, State> {
           </span>
           <p />
           <Button
-            variant="outlined"
+            variant="contained"
             color="primary"
             onClick={this.cancelSubscriptionOnClick}
             disabled={this.state.disabled}
@@ -231,10 +234,8 @@ class Billing extends React.Component<Props, State> {
       return (
         <span>
           {' '}
-          <i className="material-icons" color="action" style={{ verticalAlign: 'text-bottom' }}>
-            done
-          </i>{' '}
-          Your default payment method:
+          <DoneIcon color="action" style={{ verticalAlign: 'text-bottom' }} /> Your default payment
+          method:
           <li>
             {currentUser.stripeCard.brand}, {currentUser.stripeCard.funding} card
           </li>
@@ -244,7 +245,7 @@ class Billing extends React.Component<Props, State> {
           </li>
           <p />
           <Button
-            variant="outlined"
+            variant="contained"
             color="primary"
             onClick={() => this.handleCheckoutClick('setup')}
             disabled={this.state.disabled}

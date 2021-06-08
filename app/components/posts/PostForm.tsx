@@ -13,6 +13,8 @@ import { User } from '../../lib/store/user'
 
 import PostEditor from './PostEditor'
 
+const dev = process.env.NODE_ENV !== 'production'
+
 type Props = {
   store: Store
   isMobile: boolean
@@ -30,10 +32,14 @@ type State = {
 }
 
 class PostForm extends React.Component<Props, State> {
-  public state = {
-    postId: null,
-    content: '',
-    disabled: false,
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      postId: null,
+      content: '',
+      disabled: false,
+    }
   }
 
   public static getDerivedStateFromProps(props: Props, state: State) {
@@ -88,7 +94,7 @@ class PostForm extends React.Component<Props, State> {
             )}
             {isEditingPost ? (
               <Button
-                variant="outlined"
+                variant="contained"
                 onClick={this.closeForm}
                 disabled={this.state.disabled}
                 style={{ marginLeft: '10px' }}
@@ -110,7 +116,7 @@ class PostForm extends React.Component<Props, State> {
           <div style={{ margin: '20px 0px' }}>
             {isEditingPost ? (
               <Button
-                variant="outlined"
+                variant="contained"
                 onClick={this.closeForm}
                 disabled={this.state.disabled}
                 style={{ marginLeft: '10px' }}
@@ -177,7 +183,9 @@ class PostForm extends React.Component<Props, State> {
 
         await discussion.sendDataToLambda({
           discussionName: discussion.name,
-          discussionLink: `${process.env.URL_APP}/team/${discussion.team.slug}/discussions/${discussion.slug}`,
+          discussionLink: `${dev ? process.env.URL_APP : process.env.PRODUCTION_URL_APP}/teams/${
+            discussion.team.slug
+          }/discussions/${discussion.slug}`,
           postContent: post.content,
           authorName: post.user.displayName,
           userIds: userIdsForLambda,

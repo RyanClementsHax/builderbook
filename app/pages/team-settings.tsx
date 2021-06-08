@@ -2,6 +2,7 @@ import Avatar from '@material-ui/core/Avatar'
 import Button from '@material-ui/core/Button'
 import Hidden from '@material-ui/core/Hidden'
 import TextField from '@material-ui/core/TextField'
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline'
 import { inject, observer } from 'mobx-react'
 import Head from 'next/head'
 import NProgress from 'nprogress'
@@ -12,7 +13,6 @@ import TableCell from '@material-ui/core/TableCell'
 import TableContainer from '@material-ui/core/TableContainer'
 import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
-import Paper from '@material-ui/core/Paper'
 
 import Layout from '../components/layout'
 import InviteMember from '../components/teams/InviteMember'
@@ -100,8 +100,13 @@ class TeamSettings extends React.Component<Props, State> {
             />
             <br />
             <br />
-            <Button variant="outlined" color="primary" type="submit" disabled={this.state.disabled}>
-              Update name
+            <Button
+              variant="contained"
+              color="primary"
+              type="submit"
+              disabled={this.state.disabled}
+            >
+              Update username
             </Button>
           </form>
           <p />
@@ -119,7 +124,7 @@ class TeamSettings extends React.Component<Props, State> {
           />
           <label htmlFor="upload-file">
             <Button
-              variant="outlined"
+              variant="contained"
               color="primary"
               component="span"
               disabled={this.state.disabled}
@@ -143,7 +148,7 @@ class TeamSettings extends React.Component<Props, State> {
           </h4>
           <Button
             onClick={this.openInviteMember}
-            variant="outlined"
+            variant="contained"
             color="primary"
             style={{ float: 'right', marginTop: '-20px' }}
             disabled={this.state.disabled}
@@ -151,12 +156,13 @@ class TeamSettings extends React.Component<Props, State> {
             Invite member
           </Button>
           <p />
-          <TableContainer component={Paper}>
+          <TableContainer>
             <Table>
               <TableHead>
                 <TableRow>
                   <TableCell>Person</TableCell>
                   <TableCell>Role</TableCell>
+                  <TableCell>Action</TableCell>
                 </TableRow>
               </TableHead>
 
@@ -188,7 +194,7 @@ class TeamSettings extends React.Component<Props, State> {
                       </TableCell>
                       <TableCell>
                         {isTeamLeader && m._id !== currentUser._id ? (
-                          <i
+                          <DeleteOutlineIcon
                             color="action"
                             data-id={m._id}
                             onClick={this.removeMember}
@@ -199,10 +205,7 @@ class TeamSettings extends React.Component<Props, State> {
                               cursor: 'pointer',
                               verticalAlign: 'middle',
                             }}
-                            className="material-icons"
-                          >
-                            delete
-                          </i>
+                          />
                         ) : null}
                       </TableCell>
                     </TableRow>
@@ -218,7 +221,7 @@ class TeamSettings extends React.Component<Props, State> {
             <React.Fragment>
               <h4>Invited users</h4>
               <p />
-              <TableContainer component={Paper}>
+              <TableContainer>
                 <Table>
                   <TableHead>
                     <TableRow>

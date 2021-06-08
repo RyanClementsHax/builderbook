@@ -11,7 +11,7 @@ import { getInitialDataApiMethod } from '../lib/api/team-member'
 import { isMobile } from '../lib/isMobile'
 import { getStore, initializeStore, Store } from '../lib/store'
 
-class MyApp extends App<{ isMobile: boolean }> {
+class MyApp extends App {
   public static async getInitialProps({ Component, ctx }) {
     let firstGridItem = true
     let teamRequired = false
@@ -25,6 +25,7 @@ class MyApp extends App<{ isMobile: boolean }> {
     }
 
     if (
+      ctx.pathname.includes('/your-settings') || // because of MenuWithLinks inside `Layout` HOC
       ctx.pathname.includes('/team-settings') ||
       ctx.pathname.includes('/discussion') ||
       ctx.pathname.includes('/billing')
@@ -62,7 +63,7 @@ class MyApp extends App<{ isMobile: boolean }> {
       console.log(error)
     }
 
-    let initialData = {}
+    let initialData
 
     if (userObj) {
       try {
@@ -79,9 +80,32 @@ class MyApp extends App<{ isMobile: boolean }> {
 
     // console.log(teamSlug);
 
+    let selectedTeamSlug = ''
+
+    if (teamRequired) {
+      selectedTeamSlug = teamSlug
+    } else if (userObj) {
+      selectedTeamSlug = userObj.defaulTeamSlug
+    }
+
+    let team
+    if (initialData && initialData.teams) {
+      team = initialData.teams.find((t) => {
+        return t.slug === selectedTeamSlug
+      })
+    }
+
+    // console.log('App', selectedTeamSlug, team);
+
     return {
       ...appProps,
-      initialState: { user: userObj, currentUrl: ctx.asPath, teamSlug, ...initialData },
+      initialState: {
+        user: userObj,
+        currentUrl: ctx.asPath,
+        team,
+        teamSlug,
+        ...initialData,
+      },
     }
   }
 
@@ -107,12 +131,23 @@ class MyApp extends App<{ isMobile: boolean }> {
     const { Component, pageProps } = this.props
     const store = this.store
 
+    const isThemeDark = store.currentUser ? store.currentUser.darkTheme : true
+
+    const isServer = typeof window === 'undefined'
+
     return (
-      <ThemeProvider
-        theme={store.currentUser && store.currentUser.darkTheme ? themeDark : themeLight}
-      >
+      <ThemeProvider theme={isThemeDark ? themeDark : themeLight}>
         <Head>
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          <link rel="stylesheet" href={isServer ? '/fonts/server.css' : '/fonts/cdn.css'} />
+          <link
+            rel="stylesheet"
+            href={
+              isThemeDark
+                ? 'https://storage.googleapis.com/async-await/nprogress-light.min.css?v=1'
+                : 'https://storage.googleapis.com/async-await/nprogress-dark.min.css?v=1'
+            }
+          />
         </Head>
         <CssBaseline />
         <Provider store={store}>

@@ -1,6 +1,7 @@
 import Avatar from '@material-ui/core/Avatar'
 import Button from '@material-ui/core/Button'
 import TextField from '@material-ui/core/TextField'
+import DoneIcon from '@material-ui/icons/Done'
 import { inject, observer } from 'mobx-react'
 import Head from 'next/head'
 import NProgress from 'nprogress'
@@ -52,9 +53,7 @@ class YourSettings extends React.Component<Props, State> {
           <h3>Your Settings</h3>
           <h4 style={{ marginTop: '40px' }}>Your account</h4>
           <div>
-            <i className="material-icons" color="action" style={{ verticalAlign: 'text-bottom' }}>
-              done
-            </i>{' '}
+            <DoneIcon color="action" style={{ verticalAlign: 'text-bottom' }} />{' '}
             {currentUser.isSignedupViaGoogle
               ? 'You signed up on Async using your Google account.'
               : 'You signed up on Async using your email.'}
@@ -63,23 +62,28 @@ class YourSettings extends React.Component<Props, State> {
               Your email: <b>{currentUser.email}</b>
             </li>
             <li>
-              Your name: <b>{currentUser.displayName}</b>
+              Your username: <b>{currentUser.displayName}</b>
             </li>
           </div>
           <form onSubmit={this.onSubmit} autoComplete="off">
-            <h4>Your name</h4>
+            <h4>Your username</h4>
             <TextField
               autoComplete="off"
               value={newName}
-              helperText="Your name as seen by your team members"
+              helperText="Your username as seen by your team members"
               onChange={(event) => {
                 this.setState({ newName: event.target.value })
               }}
             />
             <br />
             <br />
-            <Button variant="outlined" color="primary" type="submit" disabled={this.state.disabled}>
-              Update name
+            <Button
+              variant="contained"
+              color="primary"
+              type="submit"
+              disabled={this.state.disabled}
+            >
+              Update username
             </Button>
           </form>
 
@@ -97,7 +101,7 @@ class YourSettings extends React.Component<Props, State> {
           />
           <label htmlFor="upload-file">
             <Button
-              variant="outlined"
+              variant="contained"
               color="primary"
               component="span"
               disabled={this.state.disabled}

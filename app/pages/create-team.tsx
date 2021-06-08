@@ -25,13 +25,17 @@ const styleGrid = {
 
 type Props = { store: Store; isMobile: boolean; teamRequired: boolean }
 
-type State = { newName: string; newAvatarUrl: string | ArrayBuffer; disabled: boolean }
+type State = { newName: string; newAvatarUrl: string; disabled: boolean }
 
 class CreateTeam extends React.Component<Props, State> {
-  public state = {
-    newName: '',
-    newAvatarUrl: 'https://storage.googleapis.com/async-await/default-user.png?v=1',
-    disabled: false,
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      newName: '',
+      newAvatarUrl: 'https://storage.googleapis.com/async-await/default-user.png?v=1',
+      disabled: false,
+    }
   }
 
   public render() {
@@ -78,7 +82,7 @@ class CreateTeam extends React.Component<Props, State> {
                   }}
                 />
                 <label htmlFor="upload-file">
-                  <Button variant="outlined" color="primary" component="span">
+                  <Button variant="contained" color="primary" component="span">
                     Select team logo
                   </Button>
                 </label>
@@ -136,7 +140,7 @@ class CreateTeam extends React.Component<Props, State> {
       console.log(`Returned to client: ${team._id}, ${team.name}, ${team.slug}`)
 
       if (file == null) {
-        Router.push(`/team/${team.slug}/team-settings`)
+        Router.push(`/teams/${team.slug}/team-settings`)
         notify('You successfully created Team.<p />Redirecting...')
         return
       }
@@ -173,7 +177,7 @@ class CreateTeam extends React.Component<Props, State> {
       })
       ;(document.getElementById('upload-file') as HTMLFormElement).value = ''
 
-      Router.push(`/team/${team.slug}/team-settings`)
+      Router.push(`/teams/${team.slug}/team-settings`)
 
       notify('You successfully created Team. Redirecting ...')
     } catch (error) {
@@ -195,7 +199,7 @@ class CreateTeam extends React.Component<Props, State> {
     reader.readAsDataURL(file)
 
     reader.onload = (e) => {
-      this.setState({ newAvatarUrl: e.target.result })
+      this.setState({ newAvatarUrl: e.target.result as string })
     }
   }
 }

@@ -1,5 +1,6 @@
 import Avatar from '@material-ui/core/Avatar'
 import Button from '@material-ui/core/Button'
+import InsertPhotoIcon from '@material-ui/icons/InsertPhoto'
 import he from 'he'
 import marked from 'marked'
 import { observer } from 'mobx-react'
@@ -47,8 +48,12 @@ type Props = {
 type State = { htmlContent: string }
 
 class PostEditor extends React.Component<Props, State> {
-  public state = {
-    htmlContent: '',
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      htmlContent: '',
+    }
   }
 
   public render() {
@@ -59,24 +64,22 @@ class PostEditor extends React.Component<Props, State> {
     const membersMinusCurrentUser = members.filter((member) => member._id !== currentUser._id)
 
     const isThemeDark = store && store.currentUser && store.currentUser.darkTheme === true
-    const textareaBackgroundColor = isThemeDark ? '#303030' : '#fff'
+    const textareaBackgroundColor = isThemeDark ? '#0d1117' : '#fff'
 
     return (
       <div style={{ marginTop: '20px' }}>
         <div style={{ display: 'inline-flex' }}>
           <Button
-            color="primary"
             onClick={this.showMarkdownContent}
             variant="text"
-            style={{ fontWeight: htmlContent ? 300 : 600 }}
+            style={{ fontWeight: htmlContent ? 300 : 600, color: '#58a6ff' }}
           >
             Markdown
           </Button>{' '}
           <Button
-            color="primary"
             onClick={this.showHtmlContent}
             variant="text"
-            style={{ fontWeight: htmlContent ? 600 : 300 }}
+            style={{ fontWeight: htmlContent ? 600 : 300, color: '#58a6ff' }}
           >
             HTML
           </Button>
@@ -84,10 +87,8 @@ class PostEditor extends React.Component<Props, State> {
 
         <div style={{ display: 'inline', float: 'left' }}>
           <label htmlFor="upload-file">
-            <Button color="primary" component="span">
-              <i className="material-icons" style={{ fontSize: '22px' }}>
-                insert_photo
-              </i>
+            <Button component="span" style={{ color: '#58a6ff' }}>
+              <InsertPhotoIcon style={{ fontSize: '22px' }} />
             </Button>
           </label>
           <input
@@ -96,18 +97,14 @@ class PostEditor extends React.Component<Props, State> {
             id="upload-file"
             type="file"
             style={{ display: 'none' }}
-            onChange={(event) => {
-              const file = event.target.files[0]
-              event.target.value = ''
-              this.uploadFile(file)
-            }}
+            onChange={this.uploadFile}
           />
         </div>
         <br />
         <div
           style={{
             width: '100%',
-            height: '100vh',
+            height: '100%',
             padding: '10px 15px',
             border: isThemeDark
               ? '1px solid rgba(255, 255, 255, 0.5)'
@@ -122,9 +119,8 @@ class PostEditor extends React.Component<Props, State> {
                 input: {
                   border: 'none',
                   outline: 'none',
-                  font: '16px Roboto',
                   color: isThemeDark ? '#fff' : '#000',
-                  fontWeight: 300,
+                  fontFamily: 'Roboto, sans-serif',
                   height: '100vh',
                   lineHeight: '1.5em',
                   backgroundColor: content ? textareaBackgroundColor : 'transparent',
@@ -208,9 +204,6 @@ class PostEditor extends React.Component<Props, State> {
         return `
           <a target="_blank" href="${href}" rel="noopener noreferrer"${t}>
             ${text}
-            <i class="material-icons" style="font-size: 13px; vertical-align: baseline">
-              launch
-            </i>
           </a>
         `
       }
@@ -227,14 +220,17 @@ class PostEditor extends React.Component<Props, State> {
     this.setState({ htmlContent })
   }
 
-  private uploadFile = async (file: File) => {
+  private uploadFile = async () => {
+    const fileElement = document.getElementById('upload-file') as HTMLFormElement
+    const file = fileElement.files[0]
+
     if (!file) {
       notify('No file selected.')
       return
     }
 
     if (!file.type || (!file.type.startsWith('image/') && file.type !== 'application/pdf')) {
-      notify('Wrong file.')
+      notify('Wrong file type.')
       return
     }
 
@@ -244,9 +240,11 @@ class PostEditor extends React.Component<Props, State> {
     NProgress.start()
 
     const bucket = process.env.BUCKET_FOR_POSTS
-    const prefix = `${currentTeam.slug}`
+    const prefix = `team-${currentTeam.slug}`
     const fileName = file.name
     const fileType = file.type
+
+    console.log(bucket)
 
     try {
       const responseFromApiServerForUpload = await getSignedRequestForUploadApiMethod({
@@ -266,6 +264,7 @@ class PostEditor extends React.Component<Props, State> {
         await uploadFileUsingSignedPutRequestApiMethod(
           resizedFile,
           responseFromApiServerForUpload.signedRequest,
+          { 'Cache-Control': 'max-age=2592000' },
         )
 
         fileUrl = responseFromApiServerForUpload.url

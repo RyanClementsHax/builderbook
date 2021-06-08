@@ -25,9 +25,9 @@ class MyDocument extends Document {
   public render() {
     // console.log('rendered on the server');
 
-    const isThemeDark =
-      this.props.__NEXT_DATA__.props.initialState.user &&
-      this.props.__NEXT_DATA__.props.initialState.user.darkTheme
+    const isThemeDark = this.props.__NEXT_DATA__.props.initialState.user
+      ? this.props.__NEXT_DATA__.props.initialState.user.darkTheme
+      : true
 
     return (
       <Html lang="en">
@@ -37,25 +37,8 @@ class MyDocument extends Document {
           <meta name="theme-color" content="#303030" />
 
           <link
-            rel="stylesheet"
-            href="https://fonts.googleapis.com/css?family=Roboto:300,400:latin"
-          />
-
-          <link
             rel="shortcut icon"
             href="https://storage.googleapis.com/async-await/async-favicon32.png"
-          />
-
-          <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
-          <link rel="stylesheet" href="https://storage.googleapis.com/async-await/vs2015.min.css" />
-
-          <link
-            rel="stylesheet"
-            href={
-              isThemeDark
-                ? 'https://storage.googleapis.com/async-await/nprogress-light.min.css?v=1'
-                : 'https://storage.googleapis.com/async-await/nprogress-dark.min.css?v=1'
-            }
           />
 
           <link
@@ -69,17 +52,11 @@ class MyDocument extends Document {
 
           <style>
             {`
-              a,
-              a:focus {
-                font-weight: 600;
-                color: #000;
+              a {
+                font-weight: 400;
+                color: #58a6ff;
                 text-decoration: none;
                 outline: none;
-              }
-              a:hover,
-              button:hover {
-                opacity: 0.6;
-                cursor: pointer;
               }
               hr {
                 border: 0.5px #707070 solid;
@@ -131,6 +108,22 @@ class MyDocument extends Document {
               }
             `}
           </style>
+          <script
+            async
+            src={`https://www.googletagmanager.com/gtag/js?id=${process.env.GA_MEASUREMENT_ID}`}
+          />
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', '${process.env.GA_MEASUREMENT_ID}', {
+                page_path: window.location.pathname,
+              });
+            `,
+            }}
+          />
         </Head>
         <body>
           <Main />

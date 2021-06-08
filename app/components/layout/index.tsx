@@ -1,6 +1,8 @@
 import Avatar from '@material-ui/core/Avatar'
 import Button from '@material-ui/core/Button'
 import Grid from '@material-ui/core/Grid'
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown'
+import LensIcon from '@material-ui/icons/Lens'
 
 import Link from 'next/link'
 import React from 'react'
@@ -11,6 +13,8 @@ import Notifier from '../common/Notifier'
 
 import { Store } from '../../lib/store'
 import DiscussionList from '../discussions/DiscussionList'
+
+const dev = process.env.NODE_ENV !== 'production'
 
 const styleGrid = {
   width: '100vw',
@@ -90,29 +94,31 @@ function LayoutWrapper({
               <MenuWithLinks
                 options={[
                   {
+                    text: 'Your Settings',
+                    href: `/your-settings?teamSlug=${store.currentTeam.slug}`,
+                    as: `/teams/${store.currentTeam.slug}/your-settings`,
+                    highlighterSlug: '/your-settings',
+                  },
+                  {
                     text: 'Team Settings',
                     href: `/team-settings?teamSlug=${store.currentTeam.slug}`,
-                    as: `/team/${store.currentTeam.slug}/team-settings`,
-                    simple: true,
+                    as: `/teams/${store.currentTeam.slug}/team-settings`,
+                    highlighterSlug: '/team-settings',
                   },
                   {
                     text: 'Billing',
                     href: `/billing?teamSlug=${store.currentTeam.slug}`,
-                    as: `/team/${store.currentTeam.slug}/billing`,
-                    simple: true,
+                    as: `/teams/${store.currentTeam.slug}/billing`,
+                    highlighterSlug: '/billing',
                   },
-                  {
-                    text: 'Your Settings',
-                    href: '/your-settings',
-                    highlighterSlug: '/your-settings',
-                  },
+
                   {
                     separator: true,
                   },
                   {
                     text: 'Log out',
-                    href: `${process.env.URL_API}/logout`,
-                    as: `${process.env.URL_API}/logout`,
+                    href: `${dev ? process.env.URL_API : process.env.PRODUCTION_URL_API}/logout`,
+                    as: `${dev ? process.env.URL_API : process.env.PRODUCTION_URL_API}/logout`,
                     externalServer: true,
                   },
                 ]}
@@ -129,9 +135,7 @@ function LayoutWrapper({
                   }}
                 />
 
-                <i className="material-icons" color="action" style={{ verticalAlign: 'super' }}>
-                  arrow_drop_down
-                </i>
+                <ArrowDropDownIcon color="action" style={{ verticalAlign: 'super' }} />
               </MenuWithLinks>
             </div>
             <hr />
@@ -202,7 +206,7 @@ class Layout extends React.Component<Props> {
                 Select existing team or create a new team.
                 <p />
                 <Link href="/create-team" as="/create-team">
-                  <Button variant="outlined" color="primary">
+                  <Button variant="contained" color="primary">
                     Create new team
                   </Button>
                 </Link>
@@ -238,7 +242,7 @@ class Layout extends React.Component<Props> {
           <div>
             {isMobile || store.currentUrl.includes('create-team') ? null : (
               <React.Fragment>
-                <i
+                <LensIcon
                   style={{
                     float: 'left',
                     margin: '15px 0px 10px 25px',
@@ -247,13 +251,10 @@ class Layout extends React.Component<Props> {
                     cursor: 'pointer',
                     verticalAlign: 'top',
                   }}
-                  className="material-icons"
                   onClick={async () => {
                     await store.currentUser.toggleTheme(!store.currentUser.darkTheme)
                   }}
-                >
-                  lens
-                </i>
+                />
               </React.Fragment>
             )}
             <div style={{ clear: 'both' }} />

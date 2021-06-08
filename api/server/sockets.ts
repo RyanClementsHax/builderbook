@@ -1,13 +1,24 @@
 import { Response } from 'express';
+import * as express from 'express';
 import { Server } from 'socket.io';
+import * as httpModule from 'http';
 
 import { DiscussionDocument } from './models/Discussion';
 import { PostDocument } from './models/Post';
 
 let io: Server = null;
-// const dev = process.env.NODE_ENV !== 'production';
 
-function setupSockets({ httpServer, origin, sessionMiddleware }) {
+const dev = process.env.NODE_ENV !== 'production';
+
+function setupSockets({
+  httpServer,
+  origin,
+  sessionMiddleware,
+}: {
+  httpServer: httpModule.Server;
+  origin: string | boolean | RegExp | (string | RegExp)[];
+  sessionMiddleware: express.RequestHandler;
+}) {
   if (io === null) {
     io = new Server(httpServer, {
       cors: {
@@ -18,8 +29,8 @@ function setupSockets({ httpServer, origin, sessionMiddleware }) {
       cookie: {
         httpOnly: true,
         maxAge: 14 * 24 * 60 * 60 * 1000, // expires in 14 days
-        domain: 'localhost',
-        secure: false,
+        domain: dev ? 'localhost' : '.async-await.com',
+        secure: dev ? false : true,
       },
       serveClient: false,
       transports: ['polling', 'websocket'],

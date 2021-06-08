@@ -11,8 +11,16 @@ import { setupPasswordless } from './passwordless-auth';
 import { setupSockets } from './sockets';
 import { stripeWebhookAndCheckoutCallback } from './stripe';
 
+import logger from './logger';
+
+import * as compression from 'compression';
+import * as helmet from 'helmet';
+
 // eslint-disable-next-line
 require('dotenv').config();
+
+const dev = process.env.NODE_ENV !== 'production';
+const port = process.env.PORT || 8000;
 
 const options = {
   useNewUrlParser: true,
@@ -21,17 +29,20 @@ const options = {
   useUnifiedTopology: true,
 };
 
-mongoose.connect(process.env.MONGO_URL_TEST, options);
+mongoose.connect(dev ? process.env.MONGO_URL_TEST : process.env.MONGO_URL, options);
 
 const server = express();
 
 server.use(
   cors({
-    origin: process.env.URL_APP,
+    origin: dev ? process.env.URL_APP : process.env.PRODUCTION_URL_APP,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   }),
 );
+
+server.use(helmet());
+server.use(compression());
 
 stripeWebhookAndCheckoutCallback({ server });
 
@@ -53,9 +64,14 @@ const sessionOptions = {
   cookie: {
     httpOnly: true,
     maxAge: 14 * 24 * 60 * 60 * 1000, // expires in 14 days
-    secure: false,
-  },
+    domain: dev ? 'localhost' : process.env.COOKIE_DOMAIN,
+  } as any,
 };
+
+if (!dev) {
+  server.set('trust proxy', 1); // sets req.hostname, req.ip
+  sessionOptions.cookie.secure = true; // sets cookie over HTTPS only
+}
 
 const sessionMiddleware = session(sessionOptions);
 server.use(sessionMiddleware);
@@ -66,12 +82,17 @@ setupPasswordless({ server });
 api(server);
 
 const httpServer = httpModule.createServer(server);
-setupSockets({ httpServer, origin: process.env.URL_APP, sessionMiddleware });
+setupSockets({
+  httpServer,
+  origin: dev ? process.env.URL_APP : process.env.PRODUCTION_URL_APP,
+  sessionMiddleware,
+});
 
 server.get('*', (_, res) => {
   res.sendStatus(403);
 });
 
-httpServer.listen(process.env.PORT_API, () => {
-  console.log(`> Ready on ${process.env.URL_API}`);
+httpServer.listen(port, () => {
+  logger.debug('debug right before info');
+  logger.info(`> Ready on ${dev ? process.env.URL_API : process.env.PRODUCTION_URL_API}`);
 });

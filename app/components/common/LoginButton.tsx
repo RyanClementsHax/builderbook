@@ -4,19 +4,24 @@ import React from 'react'
 
 import { emailLoginLinkApiMethod } from '../../lib/api/public'
 import notify from '../../lib/notify'
-import { styleLoginButton } from '../../lib/sharedStyles'
 import { makeQueryString } from '../../lib/api/makeQueryString'
+
+const dev = process.env.NODE_ENV !== 'production'
 
 type Props = { invitationToken?: string }
 type State = { email: string }
 
 class LoginButton extends React.PureComponent<Props, State> {
-  public state = { email: '' }
+  constructor(props) {
+    super(props)
+
+    this.state = { email: '' }
+  }
 
   public render() {
     const { invitationToken } = this.props
 
-    let url = `${process.env.URL_API}/auth/google`
+    let url = `${dev ? process.env.URL_API : process.env.PRODUCTION_URL_API}/auth/google`
     const qs = makeQueryString({ invitationToken })
 
     if (qs) {
@@ -27,7 +32,7 @@ class LoginButton extends React.PureComponent<Props, State> {
 
     return (
       <React.Fragment>
-        <Button variant="contained" style={styleLoginButton} href={url}>
+        <Button variant="contained" color="secondary" href={url}>
           <img
             src="https://storage.googleapis.com/async-await-all/G.svg"
             alt="Log in with Google"

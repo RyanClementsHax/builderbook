@@ -26,10 +26,12 @@ const mongoSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  memberIds: {
-    type: [String],
-    required: true,
-  },
+  memberIds: [
+    {
+      type: String,
+      required: true,
+    },
+  ],
   defaultTeam: {
     type: Boolean,
     default: false,
@@ -183,12 +185,12 @@ class TeamClass extends mongoose.Model {
 
     await this.updateOne({ _id: teamId }, { $set: modifier }, { runValidators: true });
 
-    return this.findById(teamId, 'name avatarUrl slug defaultTeam').lean();
+    return this.findById(teamId, 'name avatarUrl slug defaultTeam').setOptions({ lean: true });
   }
 
   public static getAllTeamsForUser(userId: string) {
     console.log(`userId:${userId}`);
-    return this.find({ memberIds: userId }).lean();
+    return this.find({ memberIds: userId }).setOptions({ lean: true });
   }
 
   public static async removeMember({ teamId, teamLeaderId, userId }) {
@@ -258,13 +260,13 @@ class TeamClass extends mongoose.Model {
       { new: true, runValidators: true },
     )
       .select('isSubscriptionActive stripeSubscription')
-      .lean();
+      .setOptions({ lean: true });
   }
 
   public static async cancelSubscriptionAfterFailedPayment({ subscriptionId }) {
     const team: any = await this.find({ 'stripeSubscription.id': subscriptionId })
       .select('teamLeaderId isSubscriptionActive stripeSubscription isPaymentFailed')
-      .lean();
+      .setOptions({ lean: true });
     if (!team.isSubscriptionActive) {
       throw new Error('Team is already unsubscribed.');
     }
@@ -284,7 +286,7 @@ class TeamClass extends mongoose.Model {
       { new: true, runValidators: true },
     )
       .select('isSubscriptionActive stripeSubscription isPaymentFailed')
-      .lean();
+      .setOptions({ lean: true });
   }
 }
 
